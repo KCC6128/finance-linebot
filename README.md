@@ -143,6 +143,36 @@
 
 ---
 
+## 快取機制（Cache）與注意事項
+
+### (1) retrievers/cache.py（資料源快取）
+
+* 股票清單：長 TTL（背景刷新同步 `STOCK_MAP`）
+* 股價：短 TTL
+* 新聞：中 TTL
+* 背景執行緒：定期刷新，避免每次都打 API
+
+### (2) rag.py（查詢結果快取：Query Cache）
+
+* `rag.py` 內建「查詢結果快取」（預設 120 秒）
+* 若你在短時間內用相同 query 測試（例如同一句「台積電」），可能會直接回傳快取的舊 context。
+
+測試建議：
+
+* 修改 RAG/URL 過濾/全文擷取邏輯後，若結果看起來沒更新：
+
+  * 重新啟動 `python app.py`（清空記憶體快取）
+  * 或暫時縮短 `CACHE_DURATION_SECONDS` 方便測試
+
+### (3) retrievers/fulltext.py（Full-Text 快取）
+
+* 內建 1 小時 in-memory cache（同一 URL 不重抓）
+* 若網站有反爬/付費牆/動態渲染導致抓不到全文：
+
+  * 屬正常現象，系統會 fallback 只用標題級 evidence
+
+---
+
 ## summarize.py 回覆規範（金融場景護欄）
 
 ### (1) 立場與信心（Evidence-based）
@@ -191,36 +221,6 @@
 ### (8) Token/成本 LOG
 
 * 每次回覆後印出 prompt/completion/total tokens 與預估成本（台幣）。
-
----
-
-## 快取機制（Cache）與注意事項
-
-### (1) retrievers/cache.py（資料源快取）
-
-* 股票清單：長 TTL（背景刷新同步 `STOCK_MAP`）
-* 股價：短 TTL
-* 新聞：中 TTL
-* 背景執行緒：定期刷新，避免每次都打 API
-
-### (2) rag.py（查詢結果快取：Query Cache）
-
-* `rag.py` 內建「查詢結果快取」（預設 120 秒）
-* 若你在短時間內用相同 query 測試（例如同一句「台積電」），可能會直接回傳快取的舊 context。
-
-測試建議：
-
-* 修改 RAG/URL 過濾/全文擷取邏輯後，若結果看起來沒更新：
-
-  * 重新啟動 `python app.py`（清空記憶體快取）
-  * 或暫時縮短 `CACHE_DURATION_SECONDS` 方便測試
-
-### (3) retrievers/fulltext.py（Full-Text 快取）
-
-* 內建 1 小時 in-memory cache（同一 URL 不重抓）
-* 若網站有反爬/付費牆/動態渲染導致抓不到全文：
-
-  * 屬正常現象，系統會 fallback 只用標題級 evidence
 
 ---
 
