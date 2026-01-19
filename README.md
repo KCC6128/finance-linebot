@@ -1,6 +1,6 @@
 # Finance LineBot — AI 投資助理
 
-本專案是一個台股情境的 LINE Bot，整合 FinMind 股價、FinMind 新聞與 Google News RSS，並透過 GPT 產生分析回覆。重點是「可驗證（Grounded）的 RAG」：回覆中的重點會以 [n] 對應到來源清單，並由程式自動整理出「🔗【引用來源】」，避免模型漏列或亂列引用。此外，系統會從候選新聞中挑選 Top3 抓取全文摘錄，提供更扎實的證據支撐。
+本專案是一個台股情境的 LINE Bot，整合 FinMind 股價、FinMind 新聞與 Google News RSS，並透過 GPT 產生分析回覆。重點是「可驗證（Grounded）的 RAG」：回覆中的重點會以 [n] 對應到來源清單，並由程式自動整理出「🔗【引用來源】」，避免模型漏列或亂列引用。此外，系統會從合併後的候選新聞中挑選 Top3 抓取全文摘錄，提供更扎實的證據支撐。
 
 ---
 
