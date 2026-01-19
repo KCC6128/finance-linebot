@@ -69,7 +69,7 @@
    |    - 去重後 cap=8
    | (5) URL 正規化 / 首頁過濾 => 無連結
    | (6) Lazy Full-Text Top3：
-   |    - 由 8 則挑最相關 3 則
+   |    - 由合併後（cap=8）的候選挑最相關 3 則
    |    - 抓全文並抽 1–2 段摘錄
    | (7) 組裝 Grounding Context：
    |    - [1]..[8] 來源清單（title/source/date/url）
