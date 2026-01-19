@@ -89,48 +89,6 @@
 
 ---
 
-## 專案結構（資料夾與檔案）
-
-```text
-finance-linebot/
-├─ app.py
-│  - Flask 入口與 LINE Webhook 主程式（收到訊息 → build_context → GPT summarize → reply）
-├─ config.py
-│  - 設定檔：讀取 .env（FinMind / OpenAI / LINE 相關 Key）
-├─ rag.py
-│  - RAG 主流程：股價 + 新聞檢索 + Grounding context 組裝 + 查詢快取
-├─ summarize.py
-│  - GPT 生成投資分析（強制引用/資料不足回報 + token/cost log）
-├─ requirements.txt
-│  - 套件需求
-├─ .env.example
-│  - 環境變數模板（請複製成 .env 後填入自己的金鑰）
-├─ .env
-│  - 環境變數（本機自行建立/由 .env.example 複製；已在 .gitignore，repo 不會包含）
-├─ .gitignore
-├─ .gitattributes
-├─ README.md
-│
-└─ retrievers/
-   ├─ cache.py
-   │  - FinMind 股票清單/快取層/背景自動刷新（同步 STOCK_MAP）
-   ├─ stocks.py
-   │  - FinMind 股價抓取（漲跌/報酬計算）
-   ├─ news.py
-   │  - 新聞抓取：FinMind News + Google News RSS
-   ├─ merge_utils.py
-   │  - 新聞合併與去重（各取4 + 互補 + cap=8）
-   ├─ fulltext.py
-   │  - Lazy Full-Text Top3（抓全文 + 抽摘錄 + 1hr cache）
-   └─ __init__.py
-```
-
-**備註**
-
-* `.venv / .vscode / __pycache__` 為開發環境產物，通常不需放入 repo
-
----
-
 ## RAG Grounding 設計（為什麼可信 / 為什麼不像「亂講」）
 
 ### (1) Context 一定會列「可引用來源清單」
@@ -387,6 +345,48 @@ https://xxxx-xxxx.ngrok-free.app/callback
   * ⚠️【風險與需要追蹤的點】（能引用就引用）
   * 🔗【引用來源】（程式自動整理：標題 | 來源 | YYYY/MM/DD）
   * 免責聲明
+
+---
+
+## 專案結構（資料夾與檔案）
+
+```text
+finance-linebot/
+├─ app.py
+│  - Flask 入口與 LINE Webhook 主程式（收到訊息 → build_context → GPT summarize → reply）
+├─ config.py
+│  - 設定檔：讀取 .env（FinMind / OpenAI / LINE 相關 Key）
+├─ rag.py
+│  - RAG 主流程：股價 + 新聞檢索 + Grounding context 組裝 + 查詢快取
+├─ summarize.py
+│  - GPT 生成投資分析（強制引用/資料不足回報 + token/cost log）
+├─ requirements.txt
+│  - 套件需求
+├─ .env.example
+│  - 環境變數模板（請複製成 .env 後填入自己的金鑰）
+├─ .env
+│  - 環境變數（本機自行建立/由 .env.example 複製；已在 .gitignore，repo 不會包含）
+├─ .gitignore
+├─ .gitattributes
+├─ README.md
+│
+└─ retrievers/
+   ├─ cache.py
+   │  - FinMind 股票清單/快取層/背景自動刷新（同步 STOCK_MAP）
+   ├─ stocks.py
+   │  - FinMind 股價抓取（漲跌/報酬計算）
+   ├─ news.py
+   │  - 新聞抓取：FinMind News + Google News RSS
+   ├─ merge_utils.py
+   │  - 新聞合併與去重（各取4 + 互補 + cap=8）
+   ├─ fulltext.py
+   │  - Lazy Full-Text Top3（抓全文 + 抽摘錄 + 1hr cache）
+   └─ __init__.py
+```
+
+**備註**
+
+* `.venv / .vscode / __pycache__` 為開發環境產物，通常不需放入 repo
 
 ---
 
