@@ -59,9 +59,12 @@ finance-linebot/
 │  - GPT 生成投資分析（強制引用/資料不足回報 + token/cost log）
 ├─ requirements.txt
 │  - 套件需求
+├─ .env.example
+│  - 環境變數模板（請複製成 .env 後填入自己的金鑰）
 ├─ .env
-│  - 環境變數設定（不建議上傳）
+│  - 環境變數（本機自行建立/由 .env.example 複製；已在 .gitignore，repo 不會包含）
 ├─ .gitignore
+├─ .gitattributes
 ├─ README.md
 │
 └─ retrievers/
@@ -258,14 +261,39 @@ pip install -r requirements.txt
 
 ### (3) 設定 .env（請勿上傳）
 
-建立 `finance-linebot/.env`，內容範例：
+1. **先從模板複製** `.env.example` → `.env`
+
+* Windows（PowerShell / CMD）：
+
+```bash
+copy .env.example .env
+```
+
+* macOS / Linux：
+
+```bash
+cp .env.example .env
+```
+
+2. **打開 `.env` 並填入必要金鑰（沒有就無法正常運行）**
 
 ```env
-FINMIND_API_KEY=你的金鑰
-OPENAI_API_KEY=你的OpenAI金鑰
-LINE_CHANNEL_ACCESS_TOKEN=你的LINE Token
-LINE_CHANNEL_SECRET=你的LINE Secret
+LINE_CHANNEL_SECRET=
+LINE_CHANNEL_ACCESS_TOKEN=
+OPENAI_API_KEY=
+FINMIND_API_KEY=
 ```
+
+3. **可選金鑰（目前程式已註解，不填也能跑）**
+
+```env
+# NEWSAPI_KEY=
+# FINNHUB_API_KEY=
+# ALPHAVANTAGE_API_KEY=
+```
+
+> 注意：`.env` 已被加入 `.gitignore`，請勿將金鑰上傳到 GitHub。
+
 
 ### (4) 執行伺服器
 
