@@ -1,7 +1,6 @@
 # Finance LineBot — AI 投資助理（Grounded RAG + Lazy Full-Text）
 
-一個結合 **FinMind API + Google News RSS + OpenAI GPT** 的智慧理財 LINE Bot。
-本專案重點是打造「**可驗證（Grounded）的 RAG**」：回覆每個重點都能對應到新聞來源編號 **[1][2]**；不足就誠實說資料不足，而非憑空猜測。
+本專案是一個台股情境的 LINE Bot，整合 FinMind 股價、FinMind 新聞與 Google News RSS，並透過 GPT 產生分析回覆。重點是「可驗證（Grounded）的 RAG」：回覆中的重點會以 [n] 對應到來源清單，並由程式自動整理出「🔗【引用來源】」，避免模型漏列或亂列引用。
 
 ---
 
@@ -36,7 +35,7 @@
 * **Token 用量與成本估算 LOG**
 
   * 印出 prompt/completion/total tokens
-  * 估算成本（以模型定價參數計算）
+  * 成本以程式內建的近似匯率估算（僅供參考）。
 
 * **多層快取 + 背景刷新**
 
