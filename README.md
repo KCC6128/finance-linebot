@@ -46,48 +46,6 @@
 
 ---
 
-## 專案結構（資料夾與檔案）
-
-```text
-finance-linebot/
-├─ app.py
-│  - Flask 入口與 LINE Webhook 主程式（收到訊息 → build_context → GPT summarize → reply）
-├─ config.py
-│  - 設定檔：讀取 .env（FinMind / OpenAI / LINE 相關 Key）
-├─ rag.py
-│  - RAG 主流程：股價 + 新聞檢索 + Grounding context 組裝 + 查詢快取
-├─ summarize.py
-│  - GPT 生成投資分析（強制引用/資料不足回報 + token/cost log）
-├─ requirements.txt
-│  - 套件需求
-├─ .env.example
-│  - 環境變數模板（請複製成 .env 後填入自己的金鑰）
-├─ .env
-│  - 環境變數（本機自行建立/由 .env.example 複製；已在 .gitignore，repo 不會包含）
-├─ .gitignore
-├─ .gitattributes
-├─ README.md
-│
-└─ retrievers/
-   ├─ cache.py
-   │  - FinMind 股票清單/快取層/背景自動刷新（同步 STOCK_MAP）
-   ├─ stocks.py
-   │  - FinMind 股價抓取（漲跌/報酬計算）
-   ├─ news.py
-   │  - 新聞抓取：FinMind News + Google News RSS
-   ├─ merge_utils.py
-   │  - 新聞合併與去重（各取4 + 互補 + cap=8）
-   ├─ fulltext.py
-   │  - Lazy Full-Text Top3（抓全文 + 抽摘錄 + 1hr cache）
-   └─ __init__.py
-```
-
-**備註**
-
-* `.venv / .vscode / __pycache__` 為開發環境產物，通常不需放入 repo
-
----
-
 ## 系統運作流程（高階 Pipeline）
 
 ```text
@@ -128,6 +86,48 @@ finance-linebot/
    v
 回覆 LINE 使用者
 ```
+
+---
+
+## 專案結構（資料夾與檔案）
+
+```text
+finance-linebot/
+├─ app.py
+│  - Flask 入口與 LINE Webhook 主程式（收到訊息 → build_context → GPT summarize → reply）
+├─ config.py
+│  - 設定檔：讀取 .env（FinMind / OpenAI / LINE 相關 Key）
+├─ rag.py
+│  - RAG 主流程：股價 + 新聞檢索 + Grounding context 組裝 + 查詢快取
+├─ summarize.py
+│  - GPT 生成投資分析（強制引用/資料不足回報 + token/cost log）
+├─ requirements.txt
+│  - 套件需求
+├─ .env.example
+│  - 環境變數模板（請複製成 .env 後填入自己的金鑰）
+├─ .env
+│  - 環境變數（本機自行建立/由 .env.example 複製；已在 .gitignore，repo 不會包含）
+├─ .gitignore
+├─ .gitattributes
+├─ README.md
+│
+└─ retrievers/
+   ├─ cache.py
+   │  - FinMind 股票清單/快取層/背景自動刷新（同步 STOCK_MAP）
+   ├─ stocks.py
+   │  - FinMind 股價抓取（漲跌/報酬計算）
+   ├─ news.py
+   │  - 新聞抓取：FinMind News + Google News RSS
+   ├─ merge_utils.py
+   │  - 新聞合併與去重（各取4 + 互補 + cap=8）
+   ├─ fulltext.py
+   │  - Lazy Full-Text Top3（抓全文 + 抽摘錄 + 1hr cache）
+   └─ __init__.py
+```
+
+**備註**
+
+* `.venv / .vscode / __pycache__` 為開發環境產物，通常不需放入 repo
 
 ---
 
@@ -233,6 +233,51 @@ finance-linebot/
 ### (8) Token/成本 LOG
 
 * 每次回覆後印出 prompt/completion/total tokens 與預估成本（台幣）。
+
+---
+
+## 快取機制（Cache）與注意事項
+
+### (1) retrievers/cache.py（資料源快取）
+
+* 股票清單：長 TTL（背景刷新同步 `STOCK_MAP`）
+* 股價：短 TTL
+* 新聞：中 TTL
+* 背景執行緒：定期刷新，避免每次都打 API
+
+### (2) rag.py（查詢結果快取：Query Cache）
+
+* `rag.py` 內建「查詢結果快取」（預設 120 秒）
+* 若你在短時間內用相同 query 測試（例如同一句「台積電」），可能會直接回傳快取的舊 context。
+
+測試建議：
+
+* 修改 RAG/URL 過濾/全文擷取邏輯後，若結果看起來沒更新：
+
+  * 重新啟動 `python app.py`（清空記憶體快取）
+  * 或暫時縮短 `CACHE_DURATION_SECONDS` 方便測試
+
+### (3) retrievers/fulltext.py（Full-Text 快取）
+
+* 內建 1 小時 in-memory cache（同一 URL 不重抓）
+* 若網站有反爬/付費牆/動態渲染導致抓不到全文：
+
+  * 屬正常現象，系統會 fallback 只用標題級 evidence
+
+---
+
+## LOG 範例（節錄）
+
+```text
+[RAG/Query] 🚀 收到使用者查詢：「台積電」
+[RAG/Identify] ✅ 完全命中 STOCK_MAP → 台積電 → 2330
+[RAG/Price] 💹 查詢股價 → 2330
+[RAG/News] 🗞️ 開始抓取新聞 → FinMind + Google RSS
+[RAG/NewsMerge] ✅ 合併完成，共 8 則。
+[RAG/Context] ✅ 組裝完成，共 8 則新聞。
+LOG: Token 使用情況 -> prompt=..., completion=..., total=...
+LOG: 預估成本 ≈ ... 元台幣
+```
 
 ---
 
@@ -342,51 +387,6 @@ https://xxxx-xxxx.ngrok-free.app/callback
   * ⚠️【風險與需要追蹤的點】（能引用就引用）
   * 🔗【引用來源】（程式自動整理：標題 | 來源 | YYYY/MM/DD）
   * 免責聲明
-
----
-
-## 快取機制（Cache）與注意事項
-
-### (1) retrievers/cache.py（資料源快取）
-
-* 股票清單：長 TTL（背景刷新同步 `STOCK_MAP`）
-* 股價：短 TTL
-* 新聞：中 TTL
-* 背景執行緒：定期刷新，避免每次都打 API
-
-### (2) rag.py（查詢結果快取：Query Cache）
-
-* `rag.py` 內建「查詢結果快取」（預設 120 秒）
-* 若你在短時間內用相同 query 測試（例如同一句「台積電」），可能會直接回傳快取的舊 context。
-
-測試建議：
-
-* 修改 RAG/URL 過濾/全文擷取邏輯後，若結果看起來沒更新：
-
-  * 重新啟動 `python app.py`（清空記憶體快取）
-  * 或暫時縮短 `CACHE_DURATION_SECONDS` 方便測試
-
-### (3) retrievers/fulltext.py（Full-Text 快取）
-
-* 內建 1 小時 in-memory cache（同一 URL 不重抓）
-* 若網站有反爬/付費牆/動態渲染導致抓不到全文：
-
-  * 屬正常現象，系統會 fallback 只用標題級 evidence
-
----
-
-## LOG 範例（節錄）
-
-```text
-[RAG/Query] 🚀 收到使用者查詢：「台積電」
-[RAG/Identify] ✅ 完全命中 STOCK_MAP → 台積電 → 2330
-[RAG/Price] 💹 查詢股價 → 2330
-[RAG/News] 🗞️ 開始抓取新聞 → FinMind + Google RSS
-[RAG/NewsMerge] ✅ 合併完成，共 8 則。
-[RAG/Context] ✅ 組裝完成，共 8 則新聞。
-LOG: Token 使用情況 -> prompt=..., completion=..., total=...
-LOG: 預估成本 ≈ ... 元台幣
-```
 
 ---
 
