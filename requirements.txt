@@ -1,0 +1,9 @@
+flask==3.0.0
+line-bot-sdk==3.7.0
+openai>=1.30.0
+python-dotenv==1.0.1
+requests==2.31.0
+yfinance==0.2.43
+feedparser==6.0.11
+pytz==2024.1
+gunicorn==22.0.0

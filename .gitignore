@@ -1,0 +1,16 @@
+# .gitignore 檔案內容
+
+# 忽略存放 API 金鑰和其他機密資訊的 .env 檔案
+.env
+
+# 忽略 Python 的虛擬環境資料夾 (我們稍後可能會建立)
+.venv/
+venv/
+
+# 忽略 Python 自動產生的快取檔案
+__pycache__/
+*.pyc
+
+
+# VS Code
+.vscode/
