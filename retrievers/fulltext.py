@@ -200,12 +200,8 @@ def extract_top_snippets(query: str, fulltext: str, max_snippets: int = 2) -> Li
     return out
 
 
-def lazy_fulltext_topk(query: str, news_list: List[Dict], k: int = 3) -> Dict[int, List[str]]:
-    """
-    回傳：{ 1-based-index-in-news_list : [snippet1, snippet2] }
-    注意：index 是要對應你 context 的 [i]
-    """
-    top_idx_0 = select_topk_by_title(query, news_list, k=k)
+def lazy_fulltext_topk(rank_query: str, snippet_query: str, news_list: List[Dict], k: int = 3) -> Dict[int, List[str]]:
+    top_idx_0 = select_topk_by_title(rank_query, news_list, k=k)
     result: Dict[int, List[str]] = {}
 
     for i0 in top_idx_0:
@@ -215,8 +211,9 @@ def lazy_fulltext_topk(query: str, news_list: List[Dict], k: int = 3) -> Dict[in
             continue
 
         text = fetch_fulltext(url)
-        snippets = extract_top_snippets(query, text, max_snippets=2)
+        snippets = extract_top_snippets(snippet_query, text, max_snippets=2)
         if snippets:
-            result[i0 + 1] = snippets  # 轉成 1-based
+            result[i0 + 1] = snippets
 
     return result
+

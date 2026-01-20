@@ -146,7 +146,10 @@ def build_context(query: str):
             ctx_lines.append(f"[{i}] {title} | {src} | {dt} | {url}")
 
     # --- Lazy Full-Text Top3（只抓最相關的 3 篇全文）---
-    ft_map = lazy_fulltext_topk(user_text, merged_news, k=3)
+    rank_q = f"{company_name} {ticker_id}"   # 中性：只跟公司有關
+    snippet_q = user_text                    # 保留使用者意圖：用來抽段落
+    ft_map = lazy_fulltext_topk(rank_q, snippet_q, merged_news, k=3)
+
     if ft_map:
         ctx_lines.append("")
         ctx_lines.append("[全文摘錄 (Top3，仍請用相同 [編號] 引用)]")
