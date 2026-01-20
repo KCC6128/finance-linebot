@@ -9,7 +9,7 @@
 [Watch on YouTube](https://youtu.be/fiRyKwqtMeg)
 
 <a href="https://youtu.be/fiRyKwqtMeg">
-  <img src="assets/youtube_thumb.png" width="420">
+  <img src="assets/youtube_thumb.png" width="300">
 </a>
 
 ---
