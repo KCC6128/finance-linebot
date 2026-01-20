@@ -4,6 +4,16 @@
 
 ---
 
+## 完整 Demo 影片（YouTube）
+
+[Watch on YouTube](https://youtu.be/fiRyKwqtMeg)
+
+<a href="https://youtu.be/fiRyKwqtMeg">
+  <img src="assets/youtube_thumb.png" width="420">
+</a>
+
+---
+
 ## 核心特色
 
 * **Grounded RAG / 可驗證引用**
